@@ -285,56 +285,18 @@ return L</code></pre>
                         <button onclick="copyCode('binarySearchCode')" class="absolute top-2 right-2 px-2 py-1 bg-gray-200 hover:bg-gray-300 text-gray-800 text-xs rounded-md transition">
                             <i class="fas fa-copy mr-1"></i>Copier
                         </button>
-                        <pre id="binarySearchCode" class="code-block bg-gray-800 text-gray-100 p-4 rounded-lg overflow-x-auto"><code>def recherche_dichotomique(liste_triee, element_recherche):
-    """
-    Recherche un élément dans une liste triée en utilisant la recherche dichotomique.
-    
-    Args:
-        liste_triee (list): La liste dans laquelle chercher. Doit être triée !
-        element_recherche: L'élément à trouver dans la liste.
-    
-    Returns:
-        int: L'index de l'élément s'il est trouvé, sinon -1.
-    """
-    debut = 0                      # Index du premier élément
-    fin = len(liste_triee) - 1     # Index du dernier élément
-    
+                        <pre id="binarySearchCode" class="code-block bg-gray-800 text-gray-100 p-4 rounded-lg overflow-x-auto"><code>def rechercheDichtomie(liste, val):
+    debut = 0
+    fin = len(liste)-1
     while debut <= fin:
-        # Calculer l'index du milieu (utiliser // pour une division entière)
-        milieu = (debut + fin) // 2
-        
-        # Vérifier si l'élément au milieu est celui qu'on cherche
-        if liste_triee[milieu] == element_recherche:
-            return milieu  # Trouvé ! Retourne l'index.
-        
-        # Si l'élément recherché est plus petit, chercher dans la moitié gauche
-        elif element_recherche < liste_triee[milieu]:
-            fin = milieu - 1  # Le nouvel index de fin est juste avant le milieu
-        
-        # Sinon (l'élément recherché est plus grand), chercher dans la moitié droite
+        milieu = (debut + fin)//2
+        if liste[milieu]== val:
+            return milieu
+        elif liste[milieu]> val:
+            fin = milieu-1
         else:
-            debut = milieu + 1  # Le nouvel index de début est juste après le milieu
-    
-    # Si la boucle se termine sans trouver l'élément (debut > fin)
-    return -1  # Non trouvé
-
-# Exemple d'utilisation
-ma_liste = [2, 5, 8, 12, 16, 23, 38, 56, 72, 91]  # Liste déjà triée
-element1 = 23
-element2 = 40
-
-index1 = recherche_dichotomique(ma_liste, element1)
-index2 = recherche_dichotomique(ma_liste, element2)
-
-if index1 != -1:
-    print(f"L'élément {element1} se trouve à l'index {index1}")
-else:
-    print(f"L'élément {element1} n'est pas dans la liste.")
-
-if index2 != -1:
-    print(f"L'élément {element2} se trouve à l'index {index2}")
-else:
-    print(f"L'élément {element2} n'est pas dans la liste.")</code></pre>
+            debut = milieu + 1
+    return -1</code></pre>
                     </div>
                 </div>
             </section>
