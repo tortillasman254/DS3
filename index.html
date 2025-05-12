@@ -200,58 +200,16 @@
                         <button onclick="copyCode('greedyCode')" class="absolute top-2 right-2 px-2 py-1 bg-gray-200 hover:bg-gray-300 text-gray-800 text-xs rounded-md transition">
                             <i class="fas fa-copy mr-1"></i>Copier
                         </button>
-                        <pre id="greedyCode" class="code-block bg-gray-800 text-gray-100 p-4 rounded-lg overflow-x-auto"><code>def rendu_monnaie_glouton(montant_a_rendre, pieces_disponibles):
-    """
-    Calcule le rendu de monnaie en utilisant un algorithme glouton.
-    
-    Args:
-        montant_a_rendre (int): La somme d'argent à rendre (en centimes par exemple).
-        pieces_disponibles (list): Une liste des valeurs des pièces disponibles,
-                                  supposée triée par ordre décroissant.
-    
-    Returns:
-        dict: Un dictionnaire où les clés sont les valeurs des pièces
-              et les valeurs sont le nombre de fois qu'elles sont utilisées.
-              Retourne None si le montant ne peut pas être rendu avec les pièces données.
-    """
-    if montant_a_rendre < 0:
-        return None  # Montant négatif
-    
-    # S'assurer que les pièces sont triées par ordre décroissant
-    pieces_disponibles.sort(reverse=True)
-    
-    rendu = {}  # Dictionnaire pour stocker le nombre de chaque pièce utilisée
-    montant_restant = montant_a_rendre
-    
-    for piece in pieces_disponibles:
-        if montant_restant == 0:
-            break  # On a fini de rendre la monnaie
-        
-        if piece <= montant_restant:
-            # Combien de fois peut-on utiliser cette pièce ?
-            nb_pieces = montant_restant // piece
-            if nb_pieces > 0:
-                rendu[piece] = nb_pieces
-                montant_restant %= piece  # Mettre à jour le montant restant
-    
-    # Vérifier si on a pu rendre l'intégralité du montant
-    if montant_restant == 0:
-        return rendu
-    else:
-        print(f"Attention: Impossible de rendre exactement {montant_a_rendre}. Il reste {montant_restant}.")
-        return None  # Option plus sûre indiquant un échec si le montant total n'est pas atteint
-
-# Exemple d'utilisation
-pieces_euro_centimes = [200, 100, 50, 20, 10, 5, 2, 1]  # Triées décroissant
-montant = 487  # 4 euros et 87 centimes
-monnaie_rendue = rendu_monnaie_glouton(montant, pieces_euro_centimes)
-
-if monnaie_rendue:
-    print(f"Pour rendre {montant} centimes, utilisez :")
-    for piece, nombre in sorted(monnaie_rendue.items(), reverse=True):
-        print(f"- {nombre} pièce(s) de {piece} centimes")
-else:
-    print(f"Impossible de rendre {montant} centimes avec les pièces fournies.")</code></pre>
+                        <pre id="greedyCode" class="code-block bg-gray-800 text-gray-100 p-4 rounded-lg overflow-x-auto"><code>def renduMonnaie(somme, monnaie) :
+                        i = 0
+                        L = []
+                        while somme > 0 :
+                            if somme >= monnaie[i] :
+                                somme = somme - monnaie[i]
+                                L.append(monnaie[i])
+                            else :
+                                i += 1
+                        return L</code></pre>
                     </div>
                 </div>
             </section>
