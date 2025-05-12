@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Révision Algorithmique : Glouton, Dichotomie, kNN</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+            line-height: 1.6;
+        }
+        
+        .code-block {
+            font-family: 'Fira Code', 'Courier New', monospace;
+            font-size: 0.9rem;
+        }
+        
+        .math-formula {
+            font-family: 'Times New Roman', serif;
+            font-style: italic;
+        }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        
+        /* Animation for concept cards */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .animate-fade-in {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+    </style>
+</head>
+<body class="min-h-screen py-8 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-4xl mx-auto bg-white rounded-xl shadow-md overflow-hidden">
+        <!-- Header with navigation -->
+        <div class="bg-indigo-700 px-6 py-4">
+            <div class="flex items-center justify-between">
+                <h1 class="text-2xl sm:text-3xl font-bold text-white">
+                    <i class="fas fa-brain mr-2"></i>Révision Algorithmique
+                </h1>
+                <div class="flex space-x-2">
+                    <button onclick="scrollToSection('glouton')" class="px-3 py-1 bg-indigo-600 hover:bg-indigo-500 text-white text-sm rounded-md transition">
+                        Glouton
+                    </button>
+                    <button onclick="scrollToSection('dichotomie')" class="px-3 py-1 bg-indigo-600 hover:bg-indigo-500 text-white text-sm rounded-md transition">
+                        Dichotomie
+                    </button>
+                    <button onclick="scrollToSection('knn')" class="px-3 py-1 bg-indigo-600 hover:bg-indigo-500 text-white text-sm rounded-md transition">
+                        kNN
+                    </button>
+                </div>
+            </div>
+            <p class="mt-2 text-indigo-200">
+                Algorithmes clés : Glouton (rendu de monnaie), Recherche Dichotomique, k Plus Proches Voisins (distance)
+            </p>
+        </div>
+        
+        <div class="p-6">
+            <!-- Introduction -->
+            <div class="mb-8">
+                <p class="text-gray-700 mb-4">
+                    Cette page récapitule les concepts clés et les implémentations pour les algorithmes gloutons (rendu de monnaie), la recherche dichotomique et les k plus proches voisins (kNN, focus sur la distance).
+                </p>
+                <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-lightbulb text-blue-500 mt-1"></i>
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-sm text-blue-700">
+                                <strong>Conseil :</strong> Testez les algorithmes avec différents exemples pour bien comprendre leur fonctionnement.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- ==================== Chapitre 1: Algorithmes Gloutons ==================== -->
+            <section id="glouton" class="mb-12 scroll-mt-20">
+                <div class="flex items-center mb-6">
+                    <div class="bg-indigo-100 p-2 rounded-full mr-4">
+                        <i class="fas fa-coins text-indigo-600 text-xl"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold text-gray-800">Chapitre 1 : Algorithmes Gloutons</h2>
+                </div>
+                
+                <!-- Concept Card -->
+                <div class="bg-blue-50 border border-blue-200 rounded-lg p-5 mb-6 animate-fade-in">
+                    <h3 class="text-lg font-semibold text-blue-800 mb-3 flex items-center">
+                        <i class="fas fa-question-circle mr-2"></i>Principe Général
+                    </h3>
+                    <p class="text-gray-700 mb-3">
+                        Un algorithme glouton construit une solution étape par étape. À chaque étape, il fait le choix qui semble <strong class="text-red-600">le meilleur localement</strong> (le plus "prometteur" sur le moment) dans l'espoir d'atteindre une solution optimale globale.
+                    </p>
+                    <p class="text-gray-700">
+                        <strong class="text-red-600">Attention :</strong> L'approche gloutonne ne garantit pas toujours de trouver la meilleure solution globale pour tous les problèmes. Mais pour certains, comme le rendu de monnaie avec des systèmes de pièces "canoniques" (comme l'Euro ou le Dollar US), elle fonctionne et est efficace.
+                    </p>
+                </div>
+                
+                <!-- Example: Money Change -->
+                <div class="mb-6">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-3 flex items-center">
+                        <i class="fas fa-money-bill-wave mr-2 text-green-500"></i>Exemple : Le Problème du Rendu de Monnaie
+                    </h3>
+                    <p class="text-gray-700 mb-3">
+                        <strong class="text-purple-600">Objectif :</strong> Rendre une somme d'argent donnée en utilisant le moins de pièces/billets possible, à partir d'un ensemble de pièces/billets disponibles.
+                    </p>
+                    
+                    <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 mb-4">
+                        <h4 class="font-medium text-gray-800 mb-2">Stratégie Gloutonne :</h4>
+                        <ol class="list-decimal pl-5 space-y-2">
+                            <li class="text-gray-700">Trier les dénominations de pièces/billets disponibles par ordre décroissant (si ce n'est pas déjà fait).</li>
+                            <li class="text-gray-700">Tant que le montant à rendre est supérieur à zéro :
+                                <ul class="list-disc pl-5 mt-1 space-y-1">
+                                    <li>Prendre la plus grande dénomination de pièce/billet qui est inférieure ou égale au montant restant à rendre.</li>
+                                    <li>Ajouter cette pièce/billet à la solution.</li>
+                                    <li>Soustraire la valeur de cette pièce/billet du montant restant à rendre.</li>
+                                </ul>
+                            </li>
+                        </ol>
+                    </div>
+                    
+                    <!-- Warning -->
+                    <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-r mb-4">
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                <i class="fas fa-exclamation-triangle text-yellow-500 mt-1"></i>
+                            </div>
+                            <div class="ml-3">
+                                <p class="text-sm text-yellow-700">
+                                    <strong>Important :</strong> Cette stratégie gloutonne fonctionne pour les systèmes de monnaie standards (ex: {1, 2, 5, 10, 20, 50} centimes, {1, 2} euros). Elle pourrait ne pas fonctionner pour des systèmes de pièces "exotiques" (ex: pièces {1, 3, 4} pour rendre 6. Glouton : 4+1+1=3 pièces. Optimal : 3+3=2 pièces). Pour le DS, concentre-toi sur le cas où ça marche.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Interactive Demo -->
+                <div class="mb-8">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+                        <i class="fas fa-laptop-code mr-2 text-blue-500"></i>Démonstration Interactive
+                    </h3>
+                    
+                    <div class="bg-gray-100 p-4 rounded-lg mb-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Montant à rendre</label>
+                                <input type="number" id="changeAmount" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" placeholder="Ex: 487" min="1" value="487">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Pièces disponibles (séparées par des virgules)</label>
+                                <input type="text" id="coinDenominations" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" placeholder="Ex: 200,100,50,20,10,5,2,1" value="200,100,50,20,10,5,2,1">
+                            </div>
+                        </div>
+                        
+                        <button onclick="runGreedyChange()" class="mt-4 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                            <i class="fas fa-play mr-2"></i>Exécuter l'algorithme
+                        </button>
+                    </div>
+                    
+                    <div id="changeResult" class="hidden bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
+                        <h4 class="font-medium text-gray-800 mb-2">Résultat :</h4>
+                        <div id="changeOutput" class="text-gray-700"></div>
+                    </div>
+                </div>
+                
+                <!-- Python Code -->
+                <div>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-3 flex items-center">
+                        <i class="fab fa-python mr-2 text-blue-500"></i>Programme Python : Rendu de Monnaie Glouton
+                    </h3>
+                    
+                    <div class="relative">
+                        <button onclick="copyCode('greedyCode')" class="absolute top-2 right-2 px-2 py-1 bg-gray-200 hover:bg-gray-300 text-gray-800 text-xs rounded-md transition">
+                            <i class="fas fa-copy mr-1"></i>Copier
+                        </button>
+                        <pre id="greedyCode" class="code-block bg-gray-800 text-gray-100 p-4 rounded-lg overflow-x-auto"><code>def rendu_monnaie_glouton(montant_a_rendre, pieces_disponibles):
+    """
+    Calcule le rendu de monnaie en utilisant un algorithme glouton.
+    
+    Args:
+        montant_a_rendre (int): La somme d'argent à rendre (en centimes par exemple).
+        pieces_disponibles (list): Une liste des valeurs des pièces disponibles,
+                                  supposée triée par ordre décroissant.
+    
+    Returns:
+        dict: Un dictionnaire où les clés sont les valeurs des pièces
+              et les valeurs sont le nombre de fois qu'elles sont utilisées.
+              Retourne None si le montant ne peut pas être rendu avec les pièces données.
+    """
+    if montant_a_rendre < 0:
+        return None  # Montant négatif
+    
+    # S'assurer que les pièces sont triées par ordre décroissant
+    pieces_disponibles.sort(reverse=True)
+    
+    rendu = {}  # Dictionnaire pour stocker le nombre de chaque pièce utilisée
+    montant_restant = montant_a_rendre
+    
+    for piece in pieces_disponibles:
+        if montant_restant == 0:
+            break  # On a fini de rendre la monnaie
+        
+        if piece <= montant_restant:
+            # Combien de fois peut-on utiliser cette pièce ?
+            nb_pieces = montant_restant // piece
+            if nb_pieces > 0:
+                rendu[piece] = nb_pieces
+                montant_restant %= piece  # Mettre à jour le montant restant
+    
+    # Vérifier si on a pu rendre l'intégralité du montant
+    if montant_restant == 0:
+        return rendu
+    else:
+        print(f"Attention: Impossible de rendre exactement {montant_a_rendre}. Il reste {montant_restant}.")
+        return None  # Option plus sûre indiquant un échec si le montant total n'est pas atteint
+
+# Exemple d'utilisation
+pieces_euro_centimes = [200, 100, 50, 20, 10, 5, 2, 1]  # Triées décroissant
+montant = 487  # 4 euros et 87 centimes
+monnaie_rendue = rendu_monnaie_glouton(montant, pieces_euro_centimes)
+
+if monnaie_rendue:
+    print(f"Pour rendre {montant} centimes, utilisez :")
+    for piece, nombre in sorted(monnaie_rendue.items(), reverse=True):
+        print(f"- {nombre} pièce(s) de {piece} centimes")
+else:
+    print(f"Impossible de rendre {montant} centimes avec les pièces fournies.")</code></pre>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- ==================== Chapitre 2: Dichotomie ==================== -->
+            <section id="dichotomie" class="mb-12 scroll-mt-20">
+                <div class="flex items-center mb-6">
+                    <div class="bg-indigo-100 p-2 rounded-full mr-4">
+                        <i class="fas fa-search text-indigo-600 text-xl"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold text-gray-800">Chapitre 2 : Recherche Dichotomique</h2>
+                </div>
+                
+                <!-- Concept Card -->
+                <div class="bg-blue-50 border border-blue-200 rounded-lg p-5 mb-6 animate-fade-in">
+                    <h3 class="text-lg font-semibold text-blue-800 mb-3 flex items-center">
+                        <i class="fas fa-question-circle mr-2"></i>Principe Général
+                    </h3>
+                    <p class="text-gray-700 mb-3">
+                        La recherche dichotomique (ou Binary Search) est un algorithme de recherche <strong class="text-red-600">très efficace</strong> pour trouver un élément dans une liste <strong class="text-red-600">triée</strong>.
+                    </p>
+                    <p class="text-gray-700 mb-3">Son principe est de "diviser pour régner" :</p>
+                    <ol class="list-decimal pl-5 space-y-1">
+                        <li class="text-gray-700">Comparer l'élément recherché avec l'élément au milieu de la liste.</li>
+                        <li class="text-gray-700">Si c'est l'élément recherché, on l'a trouvé.</li>
+                        <li class="text-gray-700">Si l'élément recherché est plus petit, on élimine la moitié supérieure de la liste et on recommence la recherche sur la moitié inférieure.</li>
+                        <li class="text-gray-700">Si l'élément recherché est plus grand, on élimine la moitié inférieure de la liste et on recommence la recherche sur la moitié supérieure.</li>
+                        <li class="text-gray-700">On répète ce processus jusqu'à trouver l'élément ou jusqu'à ce que la portion de liste à examiner soit vide (l'élément n'est pas présent).</li>
+                    </ol>
+                    <p class="text-gray-700 mt-3">
+                        <strong class="text-red-600">Prérequis fondamental :</strong> La liste doit être <strong class="text-red-600">triée</strong> !
+                    </p>
+                    <p class="text-gray-700">
+                        <strong class="text-red-600">Efficacité :</strong> Très rapide, complexité en O(log n), où n est la taille de la liste.
+                    </p>
+                </div>
+                
+                <!-- Visualization -->
+                <div class="mb-6">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-3 flex items-center">
+                        <i class="fas fa-project-diagram mr-2 text-purple-500"></i>Visualisation de la Recherche Dichotomique
+                    </h3>
+                    
+                    <div class="bg-gray-100 p-4 rounded-lg mb-4">
+                        <div class="flex justify-center mb-4">
+                            <div id="binarySearchVisualization" class="flex flex-wrap gap-1"></div>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Liste triée (séparée par des virgules)</label>
+                                <input type="text" id="sortedList" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" placeholder="Ex: 2,5,8,12,16,23,38,56,72,91" value="2,5,8,12,16,23,38,56,72,91">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Élément à rechercher</label>
+                                <input type="number" id="searchElement" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" placeholder="Ex: 23" value="23">
+                            </div>
+                        </div>
+                        
+                        <button onclick="visualizeBinarySearch()" class="mt-4 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                            <i class="fas fa-search mr-2"></i>Visualiser la recherche
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Python Code -->
+                <div>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-3 flex items-center">
+                        <i class="fab fa-python mr-2 text-blue-500"></i>Programme Python : Recherche Dichotomique
+                    </h3>
+                    
+                    <div class="relative">
+                        <button onclick="copyCode('binarySearchCode')" class="absolute top-2 right-2 px-2 py-1 bg-gray-200 hover:bg-gray-300 text-gray-800 text-xs rounded-md transition">
+                            <i class="fas fa-copy mr-1"></i>Copier
+                        </button>
+                        <pre id="binarySearchCode" class="code-block bg-gray-800 text-gray-100 p-4 rounded-lg overflow-x-auto"><code>def recherche_dichotomique(liste_triee, element_recherche):
+    """
+    Recherche un élément dans une liste triée en utilisant la recherche dichotomique.
+    
+    Args:
+        liste_triee (list): La liste dans laquelle chercher. Doit être triée !
+        element_recherche: L'élément à trouver dans la liste.
+    
+    Returns:
+        int: L'index de l'élément s'il est trouvé, sinon -1.
+    """
+    debut = 0                      # Index du premier élément
+    fin = len(liste_triee) - 1     # Index du dernier élément
+    
+    while debut <= fin:
+        # Calculer l'index du milieu (utiliser // pour une division entière)
+        milieu = (debut + fin) // 2
+        
+        # Vérifier si l'élément au milieu est celui qu'on cherche
+        if liste_triee[milieu] == element_recherche:
+            return milieu  # Trouvé ! Retourne l'index.
+        
+        # Si l'élément recherché est plus petit, chercher dans la moitié gauche
+        elif element_recherche < liste_triee[milieu]:
+            fin = milieu - 1  # Le nouvel index de fin est juste avant le milieu
+        
+        # Sinon (l'élément recherché est plus grand), chercher dans la moitié droite
+        else:
+            debut = milieu + 1  # Le nouvel index de début est juste après le milieu
+    
+    # Si la boucle se termine sans trouver l'élément (debut > fin)
+    return -1  # Non trouvé
+
+# Exemple d'utilisation
+ma_liste = [2, 5, 8, 12, 16, 23, 38, 56, 72, 91]  # Liste déjà triée
+element1 = 23
+element2 = 40
+
+index1 = recherche_dichotomique(ma_liste, element1)
+index2 = recherche_dichotomique(ma_liste, element2)
+
+if index1 != -1:
+    print(f"L'élément {element1} se trouve à l'index {index1}")
+else:
+    print(f"L'élément {element1} n'est pas dans la liste.")
+
+if index2 != -1:
+    print(f"L'élément {element2} se trouve à l'index {index2}")
+else:
+    print(f"L'élément {element2} n'est pas dans la liste.")</code></pre>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- ==================== Chapitre 3: kNN (Distance) ==================== -->
+            <section id="knn" class="mb-12 scroll-mt-20">
+                <div class="flex items-center mb-6">
+                    <div class="bg-indigo-100 p-2 rounded-full mr-4">
+                        <i class="fas fa-users text-indigo-600 text-xl"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold text-gray-800">Chapitre 3 : k-Plus Proches Voisins (kNN) - Focus sur la Distance</h2>
+                </div>
+                
+                <!-- Concept Card -->
+                <div class="bg-blue-50 border border-blue-200 rounded-lg p-5 mb-6 animate-fade-in">
+                    <h3 class="text-lg font-semibold text-blue-800 mb-3 flex items-center">
+                        <i class="fas fa-question-circle mr-2"></i>Principe Général de kNN
+                    </h3>
+                    <p class="text-gray-700 mb-3">
+                        L'algorithme des k-plus proches voisins (kNN) est un algorithme d'apprentissage supervisé utilisé pour la classification ou la régression.
+                    </p>
+                    <p class="text-gray-700 mb-3">Pour classer un nouveau point de données :</p>
+                    <ol class="list-decimal pl-5 space-y-1">
+                        <li class="text-gray-700"><strong class="text-red-600">Calculer la distance</strong> entre le nouveau point et tous les autres points du jeu de données d'entraînement.</li>
+                        <li class="text-gray-700">Identifier les <strong class="text-red-600">k</strong> points d'entraînement les plus proches (les "k voisins").</li>
+                        <li class="text-gray-700">Pour la classification : Attribuer au nouveau point la classe la plus fréquente parmi ses k voisins (vote majoritaire).</li>
+                        <li class="text-gray-700">Pour la régression : Attribuer au nouveau point la moyenne des valeurs de ses k voisins.</li>
+                    </ol>
+                    <p class="text-gray-700 mt-3">
+                        <strong class="text-red-600">Le calcul de la distance est une étape cruciale.</strong> La distance la plus couramment utilisée est la <strong class="text-red-600">distance Euclidienne</strong>.
+                    </p>
+                </div>
+                
+                <!-- Distance Formula -->
+                <div class="mb-6">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-3 flex items-center">
+                        <i class="fas fa-square-root-alt mr-2 text-green-500"></i>Calcul de la Distance Euclidienne
+                    </h3>
+                    <p class="text-gray-700 mb-3">
+                        La distance Euclidienne entre deux points P = (p₁, p₂, ..., p<sub>n</sub>) et Q = (q₁, q₂, ..., q<sub>n</sub>) dans un espace à <sub>n</sub> dimensions est donnée par la formule :
+                    </p>
+                    <div class="bg-gray-100 p-4 rounded-lg text-center mb-4">
+                        <p class="math-formula text-lg font-medium">
+                            Distance(P, Q) = √[ (q₁ - p₁)² + (q₂ - p₂)² + ... + (q<sub>n</sub> - p<sub>n</sub>)² ]
+                        </p>
+                    </div>
+                    <p class="text-gray-700">
+                        Autrement dit : on calcule la racine carrée de la somme des carrés des différences entre les coordonnées correspondantes des deux points.
+                    </p>
+                </div>
+                
+                <!-- Interactive Demo -->
+                <div class="mb-6">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+                        <i class="fas fa-calculator mr-2 text-blue-500"></i>Calculateur de Distance
+                    </h3>
+                    
+                    <div class="bg-gray-100 p-4 rounded-lg mb-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Point 1 (séparé par des virgules)</label>
+                                <input type="text" id="point1" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" placeholder="Ex: 1,2" value="1,2">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Point 2 (séparé par des virgules)</label>
+                                <input type="text" id="point2" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" placeholder="Ex: 4,6" value="4,6">
+                            </div>
+                        </div>
+                        
+                        <button onclick="calculateDistance()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                            <i class="fas fa-calculator mr-2"></i>Calculer la distance
+                        </button>
+                    </div>
+                    
+                    <div id="distanceResult" class="hidden bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
+                        <h4 class="font-medium text-gray-800 mb-2">Résultat :</h4>
+                        <div id="distanceOutput" class="text-gray-700"></div>
+                    </div>
+                </div>
+                
+                <!-- Python Code -->
+                <div>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-3 flex items-center">
+                        <i class="fab fa-python mr-2 text-blue-500"></i>Programme Python : Calcul de la Distance Euclidienne
+                    </h3>
+                    
+                    <div class="relative">
+                        <button onclick="copyCode('distanceCode')" class="absolute top-2 right-2 px-2 py-1 bg-gray-200 hover:bg-gray-300 text-gray-800 text-xs rounded-md transition">
+                            <i class="fas fa-copy mr-1"></i>Copier
+                        </button>
+                        <pre id="distanceCode" class="code-block bg-gray-800 text-gray-100 p-4 rounded-lg overflow-x-auto"><code>import math  # Importer le module math pour utiliser la racine carrée (sqrt)
+
+def distance_euclidienne(point1, point2):
+    """
+    Calcule la distance euclidienne entre deux points dans un espace à n dimensions.
+    
+    Args:
+        point1 (list ou tuple): Les coordonnées du premier point (ex: [x1, y1, z1]).
+        point2 (list ou tuple): Les coordonnées du second point (ex: [x2, y2, z2]).
+    
+    Returns:
+        float: La distance euclidienne entre les deux points.
+               Retourne None si les points n'ont pas le même nombre de dimensions.
+    """
+    # Vérifier que les points ont le même nombre de dimensions
+    if len(point1) != len(point2):
+        print("Erreur : Les points doivent avoir le même nombre de dimensions.")
+        return None
+    
+    somme_carres_differences = 0
+    # Parcourir toutes les dimensions (coordonnées)
+    for i in range(len(point1)):
+        difference = point1[i] - point2[i]
+        somme_carres_differences += difference ** 2  # Ajouter le carré de la différence
+    
+    # Calculer la racine carrée de la somme
+    distance = math.sqrt(somme_carres_differences)
+    return distance
+
+# Exemple d'utilisation en 2D
+point_A = [1, 2]
+point_B = [4, 6]
+dist_AB = distance_euclidienne(point_A, point_B)
+print(f"Distance entre {point_A} et {point_B} (2D) : {dist_AB:.4f}")
+# Attendu: sqrt((4-1)^2 + (6-2)^2) = sqrt(3^2 + 4^2) = sqrt(9 + 16) = sqrt(25) = 5.0
+
+# Exemple d'utilisation en 3D
+point_C = [1, 0, 5]
+point_D = [2, 2, 3]
+dist_CD = distance_euclidienne(point_C, point_D)
+print(f"Distance entre {point_C} et {point_D} (3D) : {dist_CD:.4f}")
+# Attendu: sqrt((2-1)^2 + (2-0)^2 + (3-5)^2) = sqrt(1^2 + 2^2 + (-2)^2) = sqrt(1 + 4 + 4) = sqrt(9) = 3.0
+
+# Exemple avec des dimensions différentes (doit retourner une erreur)
+point_E = [1, 1]
+point_F = [1, 1, 1]
+print(f"Tentative de calcul entre {point_E} et {point_F} :")
+dist_EF = distance_euclidienne(point_E, point_F)
+if dist_EF is None:
+    print("Calcul impossible comme attendu.")</code></pre>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- ==================== Conseils de Révision ==================== -->
+            <section id="conseils" class="mb-8">
+                <div class="flex items-center mb-6">
+                    <div class="bg-indigo-100 p-2 rounded-full mr-4">
+                        <i class="fas fa-graduation-cap text-indigo-600 text-xl"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold text-gray-800">Conseils Généraux pour le DS</h2>
+                </div>
+                
+                <ul class="space-y-4">
+                    <li class="flex items-start">
+                        <div class="flex-shrink-0 h-6 w-6 text-indigo-600 mt-1">
+                            <i class="fas fa-lightbulb"></i>
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-gray-700">
+                                <strong class="text-indigo-600">Comprendre le Principe :</strong> Ne te contente pas d'apprendre le code par cœur. Comprends <em>pourquoi</em> chaque algorithme fonctionne comme il le fait. Quels sont ses avantages et ses limites ?
+                            </p>
+                        </div>
+                    </li>
+                    
+                    <li class="flex items-start">
+                        <div class="flex-shrink-0 h-6 w-6 text-indigo-600 mt-1">
+                            <i class="fas fa-pencil-alt"></i>
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-gray-700">
+                                <strong class="text-indigo-600">Tester sur Papier :</strong> Prends des exemples simples et déroule les algorithmes à la main. C'est crucial pour le rendu de monnaie (avec différentes sommes) et la dichotomie (suivre les indices `debut`, `fin`, `milieu`).
+                            </p>
+                        </div>
+                    </li>
+                    
+                    <li class="flex items-start">
+                        <div class="flex-shrink-0 h-6 w-6 text-indigo-600 mt-1">
+                            <i class="fas fa-laptop-code"></i>
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-gray-700">
+                                <strong class="text-indigo-600">Tester le Code :</strong> Si tu as accès à un ordinateur, exécute les codes fournis avec différents inputs (cas simples, cas limites, cas d'erreur) pour bien voir leur comportement.
+                            </p>
+                        </div>
+                    </li>
+                    
+                    <li class="flex items-start">
+                        <div class="flex-shrink-0 h-6 w-6 text-indigo-600 mt-1">
+                            <i class="fas fa-redo"></i>
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-gray-700">
+                                <strong class="text-indigo-600">Récrire le Code :</strong> Essaye de réécrire les fonctions de mémoire après les avoir comprises. C'est un bon moyen de vérifier si tu maîtrises l'implémentation.
+                            </p>
+                        </div>
+                    </li>
+                    
+                    <li class="flex items-start">
+                        <div class="flex-shrink-0 h-6 w-6 text-indigo-600 mt-1">
+                            <i class="fas fa-key"></i>
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-gray-700">
+                                <strong class="text-indigo-600">Points Clés à Retenir :</strong>
+                            </p>
+                            <ul class="list-disc pl-5 mt-2 space-y-2">
+                                <li class="text-gray-700">
+                                    <strong class="text-purple-600">Glouton (Monnaie) :</strong> Choix local optimal (plus grosse pièce possible), pas toujours globalement optimal mais OK pour la monnaie standard, importance du tri des pièces.
+                                </li>
+                                <li class="text-gray-700">
+                                    <strong class="text-purple-600">Dichotomie :</strong> Nécessite une liste <strong>triée</strong>, divise la recherche par deux à chaque étape, très rapide (logarithmique).
+                                </li>
+                                <li class="text-gray-700">
+                                    <strong class="text-purple-600">kNN (Distance) :</strong> Trouve les voisins les plus proches, la distance (souvent Euclidienne) mesure la proximité, k est le nombre de voisins à considérer.
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+                    
+                    <li class="flex items-start">
+                        <div class="flex-shrink-0 h-6 w-6 text-indigo-600 mt-1">
+                            <i class="fas fa-book-reader"></i>
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-gray-700">
+                                <strong class="text-indigo-600">Relire l'Énoncé :</strong> Pendant le DS, lis bien les questions pour savoir exactement ce qui est demandé (juste l'algo ? une trace d'exécution ? le code ?).
+                            </p>
+                        </div>
+                    </li>
+                </ul>
+            </section>
+            
+            <footer class="mt-12 pt-6 border-t border-gray-200 text-center text-gray-500 text-sm">
+                <p class="mb-2">
+                    <i class="fas fa-heart text-red-500 mr-1"></i> Bonnes révisions et bonne chance pour ton DS !
+                </p>
+                <p>
+                    <i class="fas fa-code mr-1"></i> Réalisé avec HTML, CSS, JavaScript et TailwindCSS
+                </p>
+            </footer>
+        </div>
+    </div>
+
+    <script>
+        // Smooth scrolling for navigation
+        function scrollToSection(sectionId) {
+            const section = document.getElementById(sectionId);
+            if (section) {
+                section.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+        
+        // Copy code to clipboard
+        function copyCode(elementId) {
+            const codeElement = document.getElementById(elementId);
+            const range = document.createRange();
+            range.selectNode(codeElement);
+            window.getSelection().removeAllRanges();
+            window.getSelection().addRange(range);
+            document.execCommand('copy');
+            window.getSelection().removeAllRanges();
+            
+            // Show feedback
+            const button = event.target;
+            const originalText = button.innerHTML;
+            button.innerHTML = '<i class="fas fa-check mr-1"></i>Copié!';
+            setTimeout(() => {
+                button.innerHTML = originalText;
+            }, 2000);
+        }
+        
+        // Greedy change algorithm demo
+        function runGreedyChange() {
+            const amount = parseInt(document.getElementById('changeAmount').value);
+            const coinsInput = document.getElementById('coinDenominations').value;
+            const coins = coinsInput.split(',').map(coin => parseInt(coin.trim())).filter(coin => !isNaN(coin));
+            
+            if (isNaN(amount) || amount <= 0) {
+                alert("Veuillez entrer un montant valide (nombre positif)");
+                return;
+            }
+            
+            if (coins.length === 0) {
+                alert("Veuillez entrer des valeurs de pièces valides");
+                return;
+            }
+            
+            // Sort coins in descending order
+            coins.sort((a, b) => b - a);
+            
+            let remaining = amount;
+            const result = {};
+            
+            for (const coin of coins) {
+                if (remaining === 0) break;
+                
+                if (coin <= remaining) {
+                    const count = Math.floor(remaining / coin);
+                    result[coin] = count;
+                    remaining %= coin;
+                }
+            }
+            
+            const resultDiv = document.getElementById('changeResult');
+            const outputDiv = document.getElementById('changeOutput');
+            
+            if (remaining === 0) {
+                let output = `<p>Pour rendre ${amount}, utilisez :</p><ul class="list-disc pl-5 mt-2">`;
+                
+                // Sort coins in descending order for display
+                const sortedCoins = Object.keys(result).map(Number).sort((a, b) => b - a);
+                
+                for (const coin of sortedCoins) {
+                    output += `<li>${result[coin]} pièce(s) de ${coin}</li>`;
+                }
+                
+                output += `</ul>`;
+                outputDiv.innerHTML = output;
+            } else {
+                outputDiv.innerHTML = `<p class="text-red-600">Impossible de rendre exactement ${amount}. Il reste ${remaining}.</p>`;
+            }
+            
+            resultDiv.classList.remove('hidden');
+        }
+        
+        // Euclidean distance calculator
+        function calculateDistance() {
+            const point1Input = document.getElementById('point1').value;
+            const point2Input = document.getElementById('point2').value;
+            
+            const point1 = point1Input.split(',').map(coord => parseFloat(coord.trim()));
+            const point2 = point2Input.split(',').map(coord => parseFloat(coord.trim()));
+            
+            // Validate inputs
+            if (point1.some(isNaN) || point2.some(isNaN)) {
+                alert("Veuillez entrer des coordonnées valides (nombres séparés par des virgules)");
+                return;
+            }
+            
+            if (point1.length !== point2.length) {
+                document.getElementById('distanceOutput').innerHTML = `
+                    <p class="text-red-600">Erreur : Les points doivent avoir le même nombre de dimensions.</p>
+                    <p>Point 1 a ${point1.length} dimensions, Point 2 a ${point2.length} dimensions.</p>
+                `;
+                document.getElementById('distanceResult').classList.remove('hidden');
+                return;
+            }
+            
+            let sumOfSquares = 0;
+            for (let i = 0; i < point1.length; i++) {
+                const diff = point1[i] - point2[i];
+                sumOfSquares += diff * diff;
+            }
+            
+            const distance = Math.sqrt(sumOfSquares);
+            
+            let output = `
+                <p>Distance entre (${point1.join(', ')}) et (${point2.join(', ')}) :</p>
+                <p class="text-2xl font-bold text-indigo-600 my-2">${distance.toFixed(4)}</p>
+                <p class="text-sm text-gray-500">Formule utilisée : √[${point1.map((p, i) => `(${point2[i]} - ${p})²`).join(' + ')}] = √[${sumOfSquares}]</p>
+            `;
+            
+            document.getElementById('distanceOutput').innerHTML = output;
+            document.getElementById('distanceResult').classList.remove('hidden');
+        }
+        
+        // Binary search visualization
+        function visualizeBinarySearch() {
+            const listInput = document.getElementById('sortedList').value;
+            const elementInput = document.getElementById('searchElement').value;
+            
+            const list = listInput.split(',').map(item => parseInt(item.trim())).filter(item => !isNaN(item));
+            const element = parseInt(elementInput.trim());
+            
+            if (list.length === 0) {
+                alert("Veuillez entrer une liste valide (nombres séparés par des virgules)");
+                return;
+            }
+            
+            if (isNaN(element)) {
+                alert("Veuillez entrer un élément valide à rechercher (nombre)");
+                return;
+            }
+            
+            // Check if list is sorted
+            for (let i = 0; i < list.length - 1; i++) {
+                if (list[i] > list[i + 1]) {
+                    alert("La liste doit être triée pour la recherche dichotomique !");
+                    return;
+                }
+            }
+            
+            const visualizationDiv = document.getElementById('binarySearchVisualization');
+            visualizationDiv.innerHTML = '';
+            
+            let start = 0;
+            let end = list.length - 1;
+            let steps = 0;
+            let found = false;
+            let foundIndex = -1;
+            
+            // Create initial visualization
+            updateVisualization(list, start, end, -1, steps, false);
+            
+            // Simulate binary search with delays
+            const interval = setInterval(() => {
+                if (start > end) {
+                    clearInterval(interval);
+                    updateVisualization(list, start, end, -1, steps, false);
+                    return;
+                }
+                
+                steps++;
+                const mid = Math.floor((start + end) / 2);
+                
+                updateVisualization(list, start, end, mid, steps, false);
+                
+                if (list[mid] === element) {
+                    found = true;
+                    foundIndex = mid;
+                    clearInterval(interval);
+                    updateVisualization(list, start, end, mid, steps, true);
+                    return;
+                } else if (element < list[mid]) {
+                    end = mid - 1;
+                } else {
+                    start = mid + 1;
+                }
+            }, 1000);
+        }
+        
+        function updateVisualization(list, start, end, mid, steps, found) {
+            const visualizationDiv = document.getElementById('binarySearchVisualization');
+            visualizationDiv.innerHTML = '';
+            
+            // Create header
+            const header = document.createElement('div');
+            header.className = 'w-full text-center mb-2';
+            header.innerHTML = `
+                <p class="text-sm font-medium">Étape ${steps}: ${found ? 'Trouvé !' : 'Recherche en cours...'}</p>
+                <p class="text-xs text-gray-500">Intervalle: [${start}, ${end}]${mid !== -1 ? ` | Milieu: ${mid} (valeur: ${list[mid]})` : ''}</p>
+            `;
+            visualizationDiv.appendChild(header);
+            
+            // Create elements
+            for (let i = 0; i < list.length; i++) {
+                const element = document.createElement('div');
+                element.className = 'flex flex-col items-center';
+                
+                const valueBox = document.createElement('div');
+                valueBox.className = 'w-12 h-12 flex items-center justify-center border rounded-md font-medium';
+                
+                // Apply different styles based on position
+                if (i === mid) {
+                    valueBox.classList.add('bg-indigo-100', 'border-indigo-500', 'text-indigo-800');
+                } else if (i >= start && i <= end) {
+                    valueBox.classList.add('bg-blue-50', 'border-blue-200', 'text-blue-800');
+                } else {
+                    valueBox.classList.add('bg-gray-100', 'border-gray-300', 'text-gray-500');
+                }
+                
+                if (found && i === mid) {
+                    valueBox.classList.add('animate-pulse', 'bg-green-100', 'border-green-500', 'text-green-800');
+                }
+                
+                valueBox.textContent = list[i];
+                element.appendChild(valueBox);
+                
+                const indexLabel = document.createElement('div');
+                indexLabel.className = 'text-xs mt-1 text-gray-500';
+                indexLabel.textContent = i;
+                element.appendChild(indexLabel);
+                
+                visualizationDiv.appendChild(element);
+            }
+            
+            // Add legend
+            const legend = document.createElement('div');
+            legend.className = 'w-full flex justify-center space-x-4 mt-3 text-xs';
+            legend.innerHTML = `
+                <div class="flex items-center">
+                    <div class="w-3 h-3 bg-blue-50 border border-blue-200 mr-1"></div>
+                    <span>Intervalle</span>
+                </div>
+                <div class="flex items-center">
+                    <div class="w-3 h-3 bg-indigo-100 border border-indigo-500 mr-1"></div>
+                    <span>Milieu</span>
+                </div>
+                <div class="flex items-center">
+                    <div class="w-3 h-3 bg-gray-100 border border-gray-300 mr-1"></div>
+                    <span>Exclu</span>
+                </div>
+            `;
+            
+            if (found) {
+                legend.innerHTML += `
+                    <div class="flex items-center">
+                        <div class="w-3 h-3 bg-green-100 border border-green-500 mr-1"></div>
+                        <span>Trouvé</span>
+                    </div>
+                `;
+            }
+            
+            visualizationDiv.appendChild(legend);
+        }
+        
+        // Initialize animations
+        document.addEventListener('DOMContentLoaded', () => {
+            const conceptCards = document.querySelectorAll('.animate-fade-in');
+            conceptCards.forEach((card, index) => {
+                card.style.animationDelay = `${index * 0.1}s`;
+            });
+        });
+    </script>
+</body>
+</html>
