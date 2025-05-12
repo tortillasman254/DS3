@@ -200,17 +200,16 @@
                         <button onclick="copyCode('greedyCode')" class="absolute top-2 right-2 px-2 py-1 bg-gray-200 hover:bg-gray-300 text-gray-800 text-xs rounded-md transition">
                             <i class="fas fa-copy mr-1"></i>Copier
                         </button>
-                        <pre id="greedyCode" class="code-block bg-gray-800 text-gray-100 p-4 rounded-lg overflow-x-auto"><code>
-                        def renduMonnaie(somme, monnaie) :
-                            i = 0
-                            L = []
-                            while somme > 0 :
-                                if somme >= monnaie[i] :
-                                    somme = somme - monnaie[i]
-                                    L.append(monnaie[i])
-                                else :
-                                    i += 1
-                            return L</code></pre>
+                        <pre id="greedyCode" class="code-block bg-gray-800 text-gray-100 p-4 rounded-lg overflow-x-auto"><code>def renduMonnaie(somme, monnaie) :
+i = 0
+L = []
+while somme > 0 :
+    if somme >= monnaie[i] :
+    somme = somme - monnaie[i]
+    L.append(monnaie[i])
+else :
+    i += 1
+return L</code></pre>
                     </div>
                 </div>
             </section>
